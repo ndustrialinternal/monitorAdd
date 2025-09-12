@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Monitor Adder</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 1rem; 
+      max-width: 900px; 
+      margin: 2rem auto; 
+    }
+    h1 { 
+      text-align: center; 
+      margin-bottom: 2rem; 
+      color: #333;
+    }
+
+    /* Form styling */
+    .form-container {
+      background: #f9f9f9;
+      padding: 2rem;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    
+    select, input[type="text"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    
+    select:disabled, input:disabled {
+      background-color: #f5f5f5;
+      color: #666;
+    }
+
+    /* Typeahead styling */
+    .typeahead-container {
+      position: relative;
+    }
+    
+    .typeahead-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ccc;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+    }
+    
+    .typeahead-item {
+      padding: 0.75rem;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .typeahead-item:hover {
+      background-color: #f0f0f0;
+    }
+    
+    .typeahead-item:last-child {
+      border-bottom: none;
+    }
+
+    /* Submit button */
+    .submit-container {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    button:hover {
+      background: #0056b3;
+    }
+    
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* Status messages */
+    .loading, .error, .success { 
+      text-align: center; 
+      margin: 1rem 0; 
+      padding: 1rem;
+      border-radius: 4px;
+    }
+    .loading { 
+      background: #e3f2fd; 
+      color: #1976d2; 
+    }
+    .error { 
+      background: #ffebee; 
+      color: #d32f2f; 
+    }
+    .success { 
+      background: #e8f5e8; 
+      color: #2e7d32; 
+    }
+    
+    .hide { display: none; }
+
+    /* Selected items display */
+    .selected-item {
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      background: #e8f5e8;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Monitor Adder</h1>
+
+  <div class="form-container">
+    <!-- Organization selector -->
+    <div class="form-group">
+      <label for="org-select">Organization</label>
+      <select id="org-select">
+        <option value="">Select Organization</option>
+      </select>
+    </div>
+
+    <!-- Facility selector -->
+    <div class="form-group">
+      <label for="facility-select">Facility</label>
+      <select id="facility-select" disabled>
+        <option value="">Select Organization First</option>
+      </select>
+    </div>
+
+    <!-- Monitor typeahead search -->
+    <div class="form-group">
+      <label for="monitor-search">Monitor</label>
+      <div class="typeahead-container">
+        <input type="text" id="monitor-search" placeholder="Select facility first..." disabled />
+        <div id="monitor-dropdown" class="typeahead-dropdown"></div>
+      </div>
+      <div id="selected-monitor" class="selected-item hide"></div>
+    </div>
+
+    <!-- Check typeahead search -->
+    <div class="form-group">
+      <label for="check-search">Check</label>
+      <div class="typeahead-container">
+        <input type="text" id="check-search" placeholder="Select organization first..." disabled />
+        <div id="check-dropdown" class="typeahead-dropdown"></div>
+      </div>
+      <div id="selected-check" class="selected-item hide"></div>
+    </div>
+
+    <!-- Status messages -->
+    <div id="loading" class="loading hide">Loading...</div>
+    <div id="error" class="error hide"></div>
+    <div id="success" class="success hide"></div>
+
+    <!-- Submit button -->
+    <div class="submit-container">
+      <button id="submit-btn" disabled>Add Monitor to Check</button>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    // Organization to proxy endpoint mapping
+    const ORG_URLS = {
+      "Lineage":   "https://cp-alert-signoff-proxy.onrender.com/lineage",
+      "Demo":      "https://cp-alert-signoff-proxy.onrender.com/demo",
+      "Emergent":  "https://cp-alert-signoff-proxy.onrender.com/emergent",
+      "Americold": "https://cp-alert-signoff-proxy.onrender.com/americold",
+      "US Cold":   "https://cp-alert-signoff-proxy.onrender.com/uscold",
+      "Envision":  "https://cp-alert-signoff-proxy.onrender.com/envision",
+      "WL Gore":   "https://cp-alert-signoff-proxy.onrender.com/wlgore"
+    };
+
+    // DOM references
+    const orgSelect = document.getElementById('org-select');
+    const facilitySelect = document.getElementById('facility-select');
+    const monitorSearch = document.getElementById('monitor-search');
+    const monitorDropdown = document.getElementById('monitor-dropdown');
+    const selectedMonitorEl = document.getElementById('selected-monitor');
+    const checkSearch = document.getElementById('check-search');
+    const checkDropdown = document.getElementById('check-dropdown');
+    const selectedCheckEl = document.getElementById('selected-check');
+    const submitBtn = document.getElementById('submit-btn');
+    const loadingEl = document.getElementById('loading');
+    const errorEl = document.getElementById('error');
+    const successEl = document.getElementById('success');
+
+    let selectedOrgUrl = '';
+    let selectedMonitor = null;
+    let selectedCheck = null;
+    let facilities = [];
+
+    // Populate organization dropdown
+    Object.keys(ORG_URLS).forEach(function(org){
+      orgSelect.appendChild(new Option(org, org));
+    });
+
+    // Event listeners
+    orgSelect.addEventListener('change', onOrgChange);
+    facilitySelect.addEventListener('change', onFacilityChange);
+    monitorSearch.addEventListener('input', debounce(searchMonitors, 300));
+    checkSearch.addEventListener('input', debounce(searchChecks, 300));
+    submitBtn.addEventListener('click', createCheckMonitor);
+
+    // Hide dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.typeahead-container')) {
+        hideAllDropdowns();
+      }
+    });
+
+    // When organization changes
+    async function onOrgChange() {
+      const selectedOrg = orgSelect.value;
+      selectedOrgUrl = ORG_URLS[selectedOrg];
+      
+      // Reset everything
+      resetForm();
+      
+      if (!selectedOrg) {
+        disableAll();
+        return;
+      }
+
+      hideMessages();
+      
+      // Load facilities and enable check search
+      await loadFacilities();
+      enableCheckSearch();
+    }
+
+    // When facility changes
+    function onFacilityChange() {
+      selectedMonitor = null;
+      monitorSearch.value = '';
+      selectedMonitorEl.classList.add('hide');
+      
+      if (facilitySelect.value) {
+        enableMonitorSearch();
+      } else {
+        disableMonitorSearch();
+      }
+      
+      validateForm();
+    }
+
+    function resetForm() {
+      selectedMonitor = null;
+      selectedCheck = null;
+      facilities = [];
+      monitorSearch.value = '';
+      checkSearch.value = '';
+      selectedMonitorEl.classList.add('hide');
+      selectedCheckEl.classList.add('hide');
+      facilitySelect.innerHTML = '<option value="">Select Organization First</option>';
+      facilitySelect.disabled = true;
+      hideAllDropdowns();
+      validateForm();
+    }
+
+    function disableAll() {
+      facilitySelect.disabled = true;
+      monitorSearch.disabled = true;
+      checkSearch.disabled = true;
+      facilitySelect.innerHTML = '<option value="">Select Organization First</option>';
+      monitorSearch.placeholder = 'Select facility first...';
+      checkSearch.placeholder = 'Select organization first...';
+    }
+
+    function enableCheckSearch() {
+      checkSearch.disabled = false;
+      checkSearch.placeholder = 'Search for check...';
+    }
+
+    function enableMonitorSearch() {
+      monitorSearch.disabled = false;
+      monitorSearch.placeholder = 'Search for monitor...';
+    }
+
+    function disableMonitorSearch() {
+      monitorSearch.disabled = true;
+      monitorSearch.placeholder = 'Select facility first...';
+    }
+
+    function hideAllDropdowns() {
+      monitorDropdown.style.display = 'none';
+      checkDropdown.style.display = 'none';
+    }
+
+    // Load facilities for the organization
+    async function loadFacilities() {
+      if (!selectedOrgUrl) return;
+
+      facilitySelect.innerHTML = '<option value="">Loading...</option>';
+      facilitySelect.disabled = true;
+
+      try {
+        const response = await fetch(selectedOrgUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `
+              query {
+                facilities {
+                  nodes {
+                    id
+                    name
+                  }
+                }
+              }`
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch facilities: ' + response.status);
+        }
+
+        const data = await response.json();
+        if (data.errors) {
+          throw new Error('GraphQL errors: ' + data.errors.map(e => e.message).join(', '));
+        }
+
+        facilities = data.data.facilities.nodes || [];
+        populateFacilityDropdown();
+
+      } catch (error) {
+        facilitySelect.innerHTML = '<option value="">Error loading facilities</option>';
+        console.error('Error loading facilities:', error);
+      }
+    }
+
+    function populateFacilityDropdown() {
+      facilitySelect.innerHTML = '<option value="">Select Facility</option>';
+      
+      facilities
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .forEach(facility => {
+          facilitySelect.appendChild(new Option(facility.name, facility.name));
+        });
+
+      facilitySelect.disabled = false;
+    }
+
+    // Search monitors with facility filter
+    async function searchMonitors() {
+      const query = monitorSearch.value.trim();
+      const selectedFacility = facilitySelect.value;
+      
+      if (!query || !selectedOrgUrl || !selectedFacility) {
+        monitorDropdown.style.display = 'none';
+        return;
+      }
+
+      try {
+        const response = await fetch(selectedOrgUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `
+              query($filter: MonitorFilter) {
+                monitors(filter: $filter) {
+                  nodes {
+                    id
+                    name
+                    checkName
+                    facilityNames
+                  }
+                }
+              }`,
+            variables: {
+              filter: {
+                facilityNames: { equalTo: selectedFacility },
+                name: { includesInsensitive: query }
+              }
+            }
+          })
+        });
+
+        const data = await response.json();
+        displayMonitorResults(data.data.monitors.nodes || []);
+      } catch (error) {
+        console.error('Error searching monitors:', error);
+      }
+    }
+
+    function displayMonitorResults(monitors) {
+      monitorDropdown.innerHTML = '';
+      if (monitors.length === 0) {
+        monitorDropdown.innerHTML = '<div class="typeahead-item">No monitors found</div>';
+      } else {
+        monitors.forEach(monitor => {
+          const div = document.createElement('div');
+          div.className = 'typeahead-item';
+          div.innerHTML = `<strong>${monitor.name}</strong><br><small>ID: ${monitor.id}${monitor.checkName ? ' | Check: ' + monitor.checkName : ''}</small>`;
+          div.addEventListener('click', () => selectMonitor(monitor));
+          monitorDropdown.appendChild(div);
+        });
+      }
+      monitorDropdown.style.display = 'block';
+    }
+
+    function selectMonitor(monitor) {
+      selectedMonitor = monitor;
+      monitorSearch.value = monitor.name;
+      selectedMonitorEl.textContent = `Selected: ${monitor.name} (ID: ${monitor.id})`;
+      selectedMonitorEl.classList.remove('hide');
+      monitorDropdown.style.display = 'none';
+      validateForm();
+    }
+
+    // Search checks
+    async function searchChecks() {
+      const query = checkSearch.value.trim();
+      if (!query || !selectedOrgUrl) {
+        checkDropdown.style.display = 'none';
+        return;
+      }
+
+      try {
+        const response = await fetch(selectedOrgUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `
+              query($filter: CheckFilter) {
+                checks(filter: $filter) {
+                  nodes {
+                    name
+                    id
+                  }
+                }
+              }`,
+            variables: {
+              filter: {
+                name: { includesInsensitive: query }
+              }
+            }
+          })
+        });
+
+        const data = await response.json();
+        displayCheckResults(data.data.checks.nodes || []);
+      } catch (error) {
+        console.error('Error searching checks:', error);
+      }
+    }
+
+    function displayCheckResults(checks) {
+      checkDropdown.innerHTML = '';
+      if (checks.length === 0) {
+        checkDropdown.innerHTML = '<div class="typeahead-item">No checks found</div>';
+      } else {
+        checks.forEach(check => {
+          const div = document.createElement('div');
+          div.className = 'typeahead-item';
+          div.innerHTML = `<strong>${check.name}</strong><br><small>ID: ${check.id}</small>`;
+          div.addEventListener('click', () => selectCheck(check));
+          checkDropdown.appendChild(div);
+        });
+      }
+      checkDropdown.style.display = 'block';
+    }
+
+    function selectCheck(check) {
+      selectedCheck = check;
+      checkSearch.value = check.name;
+      selectedCheckEl.textContent = `Selected: ${check.name} (ID: ${check.id})`;
+      selectedCheckEl.classList.remove('hide');
+      checkDropdown.style.display = 'none';
+      validateForm();
+    }
+
+    // Validate form
+    function validateForm() {
+      const isValid = selectedMonitor && selectedCheck;
+      submitBtn.disabled = !isValid;
+    }
+
+    // Create check monitor and facility check
+    async function createCheckMonitor() {
+      if (!selectedMonitor || !selectedCheck) {
+        showError('Please select monitor and check');
+        return;
+      }
+
+      // Get facility ID from the selected facility name
+      const facility = facilities.find(f => f.name === facilitySelect.value);
+      if (!facility) {
+        showError('Please select a facility');
+        return;
+      }
+
+      hideMessages();
+      showLoading();
+      submitBtn.disabled = true;
+
+      try {
+        // Run both mutations in parallel
+        const checkMonitorPromise = fetch(selectedOrgUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `
+              mutation($input: CreateCheckMonitorInput!) {
+                createCheckMonitor(input: $input) {
+                  clientMutationId
+                }
+              }`,
+            variables: {
+              input: {
+                checkMonitor: {
+                  checkId: parseInt(selectedCheck.id),
+                  facilityId: parseInt(facility.id),
+                  monitorId: parseInt(selectedMonitor.id)
+                }
+              }
+            }
+          })
+        });
+
+        const facilityCheckPromise = fetch(selectedOrgUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `
+              mutation($input: CreateFacilityCheckInput!) {
+                createFacilityCheck(input: $input) {
+                  clientMutationId
+                }
+              }`,
+            variables: {
+              input: {
+                facilityCheck: {
+                  checkId: parseInt(selectedCheck.id),
+                  facilityId: parseInt(facility.id)
+                }
+              }
+            }
+          })
+        });
+
+        const [checkMonitorResponse, facilityCheckResponse] = await Promise.all([
+          checkMonitorPromise,
+          facilityCheckPromise
+        ]);
+
+        // Check both responses
+        if (!checkMonitorResponse.ok) {
+          throw new Error('Failed to create check monitor: ' + checkMonitorResponse.status);
+        }
+        if (!facilityCheckResponse.ok) {
+          throw new Error('Failed to create facility check: ' + facilityCheckResponse.status);
+        }
+
+        const checkMonitorData = await checkMonitorResponse.json();
+        const facilityCheckData = await facilityCheckResponse.json();
+
+        if (checkMonitorData.errors) {
+          throw new Error('Check monitor errors: ' + checkMonitorData.errors.map(e => e.message).join(', '));
+        }
+        if (facilityCheckData.errors) {
+          throw new Error('Facility check errors: ' + facilityCheckData.errors.map(e => e.message).join(', '));
+        }
+
+        hideLoading();
+        showSuccess('Successfully created check monitor and facility check!');
+        
+        // Reset form
+        resetForm();
+
+      } catch (error) {
+        hideLoading();
+        showError('Failed to create check monitor/facility check: ' + error.message);
+        validateForm();
+      }
+    }
+
+    // Utility functions
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    function showLoading() {
+      loadingEl.classList.remove('hide');
+    }
+
+    function hideLoading() {
+      loadingEl.classList.add('hide');
+    }
+
+    function showError(message) {
+      errorEl.textContent = message;
+      errorEl.classList.remove('hide');
+    }
+
+    function showSuccess(message) {
+      successEl.textContent = message;
+      successEl.classList.remove('hide');
+    }
+
+    function hideMessages() {
+      loadingEl.classList.add('hide');
+      errorEl.classList.add('hide');
+      successEl.classList.add('hide');
+    }
+
+    // Initialize
+    disableAll();
+
+  })();
+  </script>
+</body>
+</html>
