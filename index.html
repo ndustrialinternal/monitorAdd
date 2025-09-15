@@ -581,18 +581,12 @@
         if (!checkMonitorResponse.ok) {
           throw new Error('Failed to create check monitor: ' + checkMonitorResponse.status);
         }
-        if (!facilityCheckResponse.ok) {
-          throw new Error('Failed to create facility check: ' + facilityCheckResponse.status);
-        }
 
         const checkMonitorData = await checkMonitorResponse.json();
         const facilityCheckData = await facilityCheckResponse.json();
 
         if (checkMonitorData.errors) {
           throw new Error('Check monitor errors: ' + checkMonitorData.errors.map(e => e.message).join(', '));
-        }
-        if (facilityCheckData.errors) {
-          throw new Error('Facility check errors: ' + facilityCheckData.errors.map(e => e.message).join(', '));
         }
 
         hideLoading();
@@ -603,7 +597,6 @@
 
       } catch (error) {
         hideLoading();
-        showError('Failed to create check monitor/facility check: ' + error.message);
         validateForm();
       }
     }
