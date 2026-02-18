@@ -11,7 +11,7 @@
       margin: 2rem auto; 
     }
     /* Navigation Sidebar */
-        .sidebar {
+    .sidebar {
       width: 250px;
       background: linear-gradient(135deg, #8DB843 0%, #6B9532 100%);
       color: white;
@@ -62,11 +62,7 @@
       border-left-color: #fff;
       font-weight: 500;
     }
-    h1 { 
-      text-align: center; 
-      margin-bottom: 2rem; 
-      color: #333;
-    }
+
     h1 { 
       text-align: center; 
       margin-bottom: 2rem; 
@@ -120,7 +116,7 @@
       border: 1px solid #ccc;
       border-top: none;
       border-radius: 0 0 4px 4px;
-      max-height: 200px;
+      max-height: 300px;
       overflow-y: auto;
       z-index: 1000;
       display: none;
@@ -135,9 +131,40 @@
     .typeahead-item:hover {
       background-color: #f0f0f0;
     }
+
+    .typeahead-item.selected-in-list {
+      background-color: #e8f5e8;
+    }
     
     .typeahead-item:last-child {
       border-bottom: none;
+    }
+
+    /* Select All bar inside dropdown */
+    .select-all-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.75rem;
+      background: #f0f7ff;
+      border-bottom: 2px solid #cce0ff;
+      font-size: 0.9rem;
+      color: #1565c0;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .select-all-bar:hover {
+      background: #dceeff;
+    }
+
+    .select-all-bar .count-badge {
+      background: #1976d2;
+      color: white;
+      padding: 0.1rem 0.5rem;
+      border-radius: 10px;
+      font-size: 0.8rem;
     }
 
     /* Submit button */
@@ -195,28 +222,88 @@
       border-radius: 4px;
       font-size: 0.9rem;
     }
+
+    /* Multi-selected monitors list */
+    .selected-monitors-list {
+      margin-top: 0.5rem;
+    }
+
+    .selected-monitor-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #e8f5e8;
+      border: 1px solid #a5d6a7;
+      border-radius: 20px;
+      padding: 0.3rem 0.75rem;
+      margin: 0.25rem 0.25rem 0.25rem 0;
+      font-size: 0.85rem;
+      color: #2e7d32;
+    }
+
+    .selected-monitor-tag .remove-tag {
+      cursor: pointer;
+      font-weight: bold;
+      color: #c62828;
+      font-size: 1rem;
+      line-height: 1;
+      border: none;
+      background: none;
+      padding: 0;
+      margin: 0;
+      min-width: unset;
+      color: #c62828;
+    }
+
+    .selected-monitor-tag .remove-tag:hover {
+      background: none;
+      color: #b71c1c;
+    }
+
+    .monitors-summary {
+      font-size: 0.85rem;
+      color: #555;
+      margin-top: 0.4rem;
+    }
+
+    .clear-all-btn {
+      background: none;
+      border: 1px solid #e53935;
+      color: #e53935;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 0.5rem;
+    }
+
+    .clear-all-btn:hover {
+      background: #ffebee;
+      color: #b71c1c;
+    }
   </style>
 </head>
 <body>    
   <nav class="sidebar">
-        <div class="sidebar-header">
-          <a href="#" class="sidebar-title">Monitor Alerts Setup</a>
-        </div>
-        <div class="nav-menu">
-          <a href="https://ndustrialinternal.github.io/checkCreator/" class="nav-item">Step 1 - Create Checks</a>
-          <a href="https://ndustrialinternal.github.io/monitorAdd/" class="nav-item active">Step 2 - Add Monitors</a>
-          <a href="https://ndustrialinternal.github.io/SubscribeUser/" class="nav-item">Step 3 Subscribe Users</a>
-          <a href="https://ndustrialinternal.github.io/UnsubscribeUser/" class="nav-item">Step 4 Unsubscribe Users</a>
-          <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.2);">
-  <a href="https://docs.google.com/document/d/10Dqs98g22ToKnryuLeJToUehbigKlNurY8eTORvE2KE/edit?usp=sharing" 
-     target="_blank" 
-     class="nav-item" 
-     style="opacity: 0.8; font-size: 0.9rem;">
-    Documentation
-  </a>
-</div>
-        </div>
-      </nav>
+    <div class="sidebar-header">
+      <a href="#" class="sidebar-title">Monitor Alerts Setup</a>
+    </div>
+    <div class="nav-menu">
+      <a href="https://ndustrialinternal.github.io/checkCreator/" class="nav-item">Step 1 - Create Checks</a>
+      <a href="https://ndustrialinternal.github.io/monitorAdd/" class="nav-item active">Step 2 - Add Monitors</a>
+      <a href="https://ndustrialinternal.github.io/SubscribeUser/" class="nav-item">Step 3 Subscribe Users</a>
+      <a href="https://ndustrialinternal.github.io/UnsubscribeUser/" class="nav-item">Step 4 Unsubscribe Users</a>
+      <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.2);">
+        <a href="https://docs.google.com/document/d/10Dqs98g22ToKnryuLeJToUehbigKlNurY8eTORvE2KE/edit?usp=sharing" 
+           target="_blank" 
+           class="nav-item" 
+           style="opacity: 0.8; font-size: 0.9rem;">
+          Documentation
+        </a>
+      </div>
+    </div>
+  </nav>
+
   <h1>Monitor Adder</h1>
 
   <div class="form-container">
@@ -243,7 +330,9 @@
         <input type="text" id="monitor-search" placeholder="Select facility first..." disabled />
         <div id="monitor-dropdown" class="typeahead-dropdown"></div>
       </div>
-      <div id="selected-monitor" class="selected-item hide"></div>
+      <!-- Multi-select tags area -->
+      <div id="selected-monitors-list" class="selected-monitors-list hide"></div>
+      <div id="monitors-summary" class="monitors-summary hide"></div>
     </div>
 
     <!-- Check typeahead search -->
@@ -269,7 +358,6 @@
 
   <script>
   (function(){
-    // Organization to proxy endpoint mapping
     const ORG_URLS = {
       "Lineage":   "https://cp-alert-signoff-proxy.onrender.com/lineage",
       "Demo":      "https://cp-alert-signoff-proxy.onrender.com/demo",
@@ -278,17 +366,17 @@
       "US Cold":   "https://cp-alert-signoff-proxy.onrender.com/uscold",
       "Envision":  "https://cp-alert-signoff-proxy.onrender.com/envision",
       "WL Gore":   "https://cp-alert-signoff-proxy.onrender.com/wlgore",
-      "Kodi": "https://cp-alert-signoff-proxy.onrender.com/wlgore",
-            "ABB":        "https://cp-alert-signoff-proxy.onrender.com/abb",
+      "Kodi":      "https://cp-alert-signoff-proxy.onrender.com/wlgore",
+      "ABB":       "https://cp-alert-signoff-proxy.onrender.com/abb",
       "Murphy":    "https://cp-alert-signoff-proxy.onrender.com/murphy"
     };
 
-    // DOM references
     const orgSelect = document.getElementById('org-select');
     const facilitySelect = document.getElementById('facility-select');
     const monitorSearch = document.getElementById('monitor-search');
     const monitorDropdown = document.getElementById('monitor-dropdown');
-    const selectedMonitorEl = document.getElementById('selected-monitor');
+    const selectedMonitorsList = document.getElementById('selected-monitors-list');
+    const monitorsSummary = document.getElementById('monitors-summary');
     const checkSearch = document.getElementById('check-search');
     const checkDropdown = document.getElementById('check-dropdown');
     const selectedCheckEl = document.getElementById('selected-check');
@@ -298,71 +386,59 @@
     const successEl = document.getElementById('success');
 
     let selectedOrgUrl = '';
-    let selectedMonitor = null;
+    // Now an array of monitors
+    let selectedMonitors = [];
     let selectedCheck = null;
     let facilities = [];
+    // Last search results for "select all"
+    let lastMonitorResults = [];
 
-    // Populate organization dropdown
     Object.keys(ORG_URLS).forEach(function(org){
       orgSelect.appendChild(new Option(org, org));
     });
 
-    // Event listeners
     orgSelect.addEventListener('change', onOrgChange);
     facilitySelect.addEventListener('change', onFacilityChange);
     monitorSearch.addEventListener('input', debounce(searchMonitors, 300));
     checkSearch.addEventListener('input', debounce(searchChecks, 300));
-    submitBtn.addEventListener('click', createCheckMonitor);
+    submitBtn.addEventListener('click', createCheckMonitors);
 
-    // Hide dropdowns when clicking outside
     document.addEventListener('click', function(e) {
       if (!e.target.closest('.typeahead-container')) {
         hideAllDropdowns();
       }
     });
 
-    // When organization changes
     async function onOrgChange() {
       const selectedOrg = orgSelect.value;
       selectedOrgUrl = ORG_URLS[selectedOrg];
-      
-      // Reset everything
       resetForm();
-      
-      if (!selectedOrg) {
-        disableAll();
-        return;
-      }
-
+      if (!selectedOrg) { disableAll(); return; }
       hideMessages();
-      
-      // Load facilities and enable check search
       await loadFacilities();
       enableCheckSearch();
     }
 
-    // When facility changes
     function onFacilityChange() {
-      selectedMonitor = null;
+      selectedMonitors = [];
       monitorSearch.value = '';
-      selectedMonitorEl.classList.add('hide');
-      
+      renderSelectedMonitors();
       if (facilitySelect.value) {
         enableMonitorSearch();
       } else {
         disableMonitorSearch();
       }
-      
       validateForm();
     }
 
     function resetForm() {
-      selectedMonitor = null;
+      selectedMonitors = [];
       selectedCheck = null;
       facilities = [];
+      lastMonitorResults = [];
       monitorSearch.value = '';
       checkSearch.value = '';
-      selectedMonitorEl.classList.add('hide');
+      renderSelectedMonitors();
       selectedCheckEl.classList.add('hide');
       facilitySelect.innerHTML = '<option value="">Select Organization First</option>';
       facilitySelect.disabled = true;
@@ -399,42 +475,23 @@
       checkDropdown.style.display = 'none';
     }
 
-    // Load facilities for the organization
     async function loadFacilities() {
       if (!selectedOrgUrl) return;
-
       facilitySelect.innerHTML = '<option value="">Loading...</option>';
       facilitySelect.disabled = true;
-
       try {
         const response = await fetch(selectedOrgUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            query: `
-              query {
-                facilities {
-                  nodes {
-                    id
-                    name
-                  }
-                }
-              }`
+            query: `query { facilities { nodes { id name } } }`
           })
         });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch facilities: ' + response.status);
-        }
-
+        if (!response.ok) throw new Error('Failed to fetch facilities: ' + response.status);
         const data = await response.json();
-        if (data.errors) {
-          throw new Error('GraphQL errors: ' + data.errors.map(e => e.message).join(', '));
-        }
-
+        if (data.errors) throw new Error('GraphQL errors: ' + data.errors.map(e => e.message).join(', '));
         facilities = data.data.facilities.nodes || [];
         populateFacilityDropdown();
-
       } catch (error) {
         facilitySelect.innerHTML = '<option value="">Error loading facilities</option>';
         console.error('Error loading facilities:', error);
@@ -443,26 +500,21 @@
 
     function populateFacilityDropdown() {
       facilitySelect.innerHTML = '<option value="">Select Facility</option>';
-      
       facilities
         .sort((a, b) => a.name.localeCompare(b.name))
         .forEach(facility => {
           facilitySelect.appendChild(new Option(facility.name, facility.name));
         });
-
       facilitySelect.disabled = false;
     }
 
-    // Search monitors with facility filter
     async function searchMonitors() {
       const query = monitorSearch.value.trim();
       const selectedFacility = facilitySelect.value;
-      
       if (!query || !selectedOrgUrl || !selectedFacility) {
         monitorDropdown.style.display = 'none';
         return;
       }
-
       try {
         const response = await fetch(selectedOrgUrl, {
           method: 'POST',
@@ -471,12 +523,7 @@
             query: `
               query($filter: MonitorFilter) {
                 monitors(filter: $filter) {
-                  nodes {
-                    id
-                    name
-                    checkName
-                    facilityNames
-                  }
+                  nodes { id name checkName facilityNames }
                 }
               }`,
             variables: {
@@ -487,9 +534,9 @@
             }
           })
         });
-
         const data = await response.json();
-        displayMonitorResults(data.data.monitors.nodes || []);
+        lastMonitorResults = data.data.monitors.nodes || [];
+        displayMonitorResults(lastMonitorResults);
       } catch (error) {
         console.error('Error searching monitors:', error);
       }
@@ -497,37 +544,126 @@
 
     function displayMonitorResults(monitors) {
       monitorDropdown.innerHTML = '';
+
       if (monitors.length === 0) {
         monitorDropdown.innerHTML = '<div class="typeahead-item">No monitors found</div>';
-      } else {
-        monitors.forEach(monitor => {
-          const div = document.createElement('div');
-          div.className = 'typeahead-item';
-          div.innerHTML = `<strong>${monitor.name}</strong><br><small>ID: ${monitor.id}${monitor.checkName ? ' | Check: ' + monitor.checkName : ''}</small>`;
-          div.addEventListener('click', () => selectMonitor(monitor));
-          monitorDropdown.appendChild(div);
-        });
-      }
-      monitorDropdown.style.display = 'block';
-    }
-
-    function selectMonitor(monitor) {
-      selectedMonitor = monitor;
-      monitorSearch.value = monitor.name;
-      selectedMonitorEl.textContent = `Selected: ${monitor.name} (ID: ${monitor.id})`;
-      selectedMonitorEl.classList.remove('hide');
-      monitorDropdown.style.display = 'none';
-      validateForm();
-    }
-
-    // Search checks
-    async function searchChecks() {
-      const query = checkSearch.value.trim();
-      if (!query || !selectedOrgUrl) {
-        checkDropdown.style.display = 'none';
+        monitorDropdown.style.display = 'block';
         return;
       }
 
+      // --- Select All bar ---
+      const alreadySelectedIds = new Set(selectedMonitors.map(m => m.id));
+      const unselectedCount = monitors.filter(m => !alreadySelectedIds.has(m.id)).length;
+      const allSelected = unselectedCount === 0;
+
+      const selectAllBar = document.createElement('div');
+      selectAllBar.className = 'select-all-bar';
+
+      if (allSelected) {
+        selectAllBar.innerHTML = `
+          <span>✓ All ${monitors.length} results selected</span>
+          <span class="count-badge">Deselect All</span>`;
+        selectAllBar.addEventListener('click', () => {
+          deselectAll(monitors);
+        });
+      } else {
+        selectAllBar.innerHTML = `
+          <span>Select All Results</span>
+          <span class="count-badge">${unselectedCount} monitor${unselectedCount !== 1 ? 's' : ''}</span>`;
+        selectAllBar.addEventListener('click', () => {
+          selectAll(monitors);
+        });
+      }
+      monitorDropdown.appendChild(selectAllBar);
+
+      // --- Individual results ---
+      monitors.forEach(monitor => {
+        const div = document.createElement('div');
+        div.className = 'typeahead-item';
+        const isSelected = alreadySelectedIds.has(monitor.id);
+        if (isSelected) div.classList.add('selected-in-list');
+        div.innerHTML = `
+          <span style="margin-right:0.4rem;">${isSelected ? '✓' : ''}</span>
+          <strong>${monitor.name}</strong>
+          <br><small>ID: ${monitor.id}${monitor.checkName ? ' | Check: ' + monitor.checkName : ''}</small>`;
+        div.addEventListener('click', () => toggleMonitor(monitor));
+        monitorDropdown.appendChild(div);
+      });
+
+      monitorDropdown.style.display = 'block';
+    }
+
+    function selectAll(monitors) {
+      const currentIds = new Set(selectedMonitors.map(m => m.id));
+      monitors.forEach(m => {
+        if (!currentIds.has(m.id)) {
+          selectedMonitors.push(m);
+          currentIds.add(m.id);
+        }
+      });
+      renderSelectedMonitors();
+      displayMonitorResults(lastMonitorResults); // refresh dropdown state
+      validateForm();
+    }
+
+    function deselectAll(monitors) {
+      const idsToRemove = new Set(monitors.map(m => m.id));
+      selectedMonitors = selectedMonitors.filter(m => !idsToRemove.has(m.id));
+      renderSelectedMonitors();
+      displayMonitorResults(lastMonitorResults);
+      validateForm();
+    }
+
+    function toggleMonitor(monitor) {
+      const idx = selectedMonitors.findIndex(m => m.id === monitor.id);
+      if (idx === -1) {
+        selectedMonitors.push(monitor);
+      } else {
+        selectedMonitors.splice(idx, 1);
+      }
+      renderSelectedMonitors();
+      displayMonitorResults(lastMonitorResults); // refresh checkmarks
+      validateForm();
+    }
+
+    function renderSelectedMonitors() {
+      selectedMonitorsList.innerHTML = '';
+      if (selectedMonitors.length === 0) {
+        selectedMonitorsList.classList.add('hide');
+        monitorsSummary.classList.add('hide');
+        return;
+      }
+
+      selectedMonitorsList.classList.remove('hide');
+
+      selectedMonitors.forEach(monitor => {
+        const tag = document.createElement('span');
+        tag.className = 'selected-monitor-tag';
+        tag.innerHTML = `${monitor.name} <button class="remove-tag" title="Remove">×</button>`;
+        tag.querySelector('.remove-tag').addEventListener('click', () => {
+          selectedMonitors = selectedMonitors.filter(m => m.id !== monitor.id);
+          renderSelectedMonitors();
+          displayMonitorResults(lastMonitorResults);
+          validateForm();
+        });
+        selectedMonitorsList.appendChild(tag);
+      });
+
+      // Summary line with clear-all
+      monitorsSummary.classList.remove('hide');
+      monitorsSummary.innerHTML = `${selectedMonitors.length} monitor${selectedMonitors.length !== 1 ? 's' : ''} selected
+        <button class="clear-all-btn" id="clear-all-monitors">Clear All</button>`;
+      document.getElementById('clear-all-monitors').addEventListener('click', () => {
+        selectedMonitors = [];
+        renderSelectedMonitors();
+        displayMonitorResults(lastMonitorResults);
+        validateForm();
+      });
+    }
+
+    async function searchChecks() {
+      const query = checkSearch.value.trim();
+      if (!query || !selectedOrgUrl) { checkDropdown.style.display = 'none'; return; }
       try {
         const response = await fetch(selectedOrgUrl, {
           method: 'POST',
@@ -536,20 +672,12 @@
             query: `
               query($filter: CheckFilter) {
                 checks(filter: $filter) {
-                  nodes {
-                    name
-                    id
-                  }
+                  nodes { name id }
                 }
               }`,
-            variables: {
-              filter: {
-                name: { includesInsensitive: query }
-              }
-            }
+            variables: { filter: { name: { includesInsensitive: query } } }
           })
         });
-
         const data = await response.json();
         displayCheckResults(data.data.checks.nodes || []);
       } catch (error) {
@@ -582,142 +710,117 @@
       validateForm();
     }
 
-    // Validate form
     function validateForm() {
-      const isValid = selectedMonitor && selectedCheck;
+      const isValid = selectedMonitors.length > 0 && selectedCheck;
       submitBtn.disabled = !isValid;
+      submitBtn.textContent = selectedMonitors.length > 1
+        ? `Add ${selectedMonitors.length} Monitors to Check`
+        : 'Add Monitor to Check';
     }
 
-    // Create check monitor and facility check
-    async function createCheckMonitor() {
-      if (!selectedMonitor || !selectedCheck) {
-        showError('Please select monitor and check');
+    // Submit all selected monitors in sequence
+    async function createCheckMonitors() {
+      if (!selectedMonitors.length || !selectedCheck) {
+        showError('Please select at least one monitor and a check');
         return;
       }
-
-      // Get facility ID from the selected facility name
       const facility = facilities.find(f => f.name === facilitySelect.value);
-      if (!facility) {
-        showError('Please select a facility');
-        return;
-      }
+      if (!facility) { showError('Please select a facility'); return; }
 
       hideMessages();
       showLoading();
       submitBtn.disabled = true;
 
-      try {
-        // Run both mutations in parallel
-        const checkMonitorPromise = fetch(selectedOrgUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: `
-              mutation($input: CreateCheckMonitorInput!) {
-                createCheckMonitor(input: $input) {
-                  clientMutationId
-                }
-              }`,
-            variables: {
-              input: {
-                checkMonitor: {
-                  checkId: parseInt(selectedCheck.id),
-                  facilityId: parseInt(facility.id),
-                  monitorId: parseInt(selectedMonitor.id)
-                }
-              }
-            }
-          })
-        });
+      let successCount = 0;
+      let errors = [];
 
-        const facilityCheckPromise = fetch(selectedOrgUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: `
-              mutation($input: CreateFacilityCheckInput!) {
-                createFacilityCheck(input: $input) {
-                  clientMutationId
-                }
-              }`,
-            variables: {
-              input: {
-                facilityCheck: {
-                  checkId: parseInt(selectedCheck.id),
-                  facilityId: parseInt(facility.id)
+      for (const monitor of selectedMonitors) {
+        try {
+          const checkMonitorPromise = fetch(selectedOrgUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query: `
+                mutation($input: CreateCheckMonitorInput!) {
+                  createCheckMonitor(input: $input) { clientMutationId }
+                }`,
+              variables: {
+                input: {
+                  checkMonitor: {
+                    checkId: parseInt(selectedCheck.id),
+                    facilityId: parseInt(facility.id),
+                    monitorId: parseInt(monitor.id)
+                  }
                 }
               }
-            }
-          })
-        });
+            })
+          });
 
-        const [checkMonitorResponse, facilityCheckResponse] = await Promise.all([
-          checkMonitorPromise,
-          facilityCheckPromise
-        ]);
+          const facilityCheckPromise = fetch(selectedOrgUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query: `
+                mutation($input: CreateFacilityCheckInput!) {
+                  createFacilityCheck(input: $input) { clientMutationId }
+                }`,
+              variables: {
+                input: {
+                  facilityCheck: {
+                    checkId: parseInt(selectedCheck.id),
+                    facilityId: parseInt(facility.id)
+                  }
+                }
+              }
+            })
+          });
 
-        // Check both responses
-        if (!checkMonitorResponse.ok) {
-          throw new Error('Failed to create check monitor: ' + checkMonitorResponse.status);
+          const [cmRes, fcRes] = await Promise.all([checkMonitorPromise, facilityCheckPromise]);
+
+          if (!cmRes.ok) throw new Error(`HTTP ${cmRes.status}`);
+          const cmData = await cmRes.json();
+          if (cmData.errors) throw new Error(cmData.errors.map(e => e.message).join(', '));
+
+          successCount++;
+        } catch (err) {
+          errors.push(`${monitor.name}: ${err.message}`);
         }
+      }
 
-        const checkMonitorData = await checkMonitorResponse.json();
-        const facilityCheckData = await facilityCheckResponse.json();
+      hideLoading();
 
-        if (checkMonitorData.errors) {
-          throw new Error('Check monitor errors: ' + checkMonitorData.errors.map(e => e.message).join(', '));
-        }
-
-        hideLoading();
-        showSuccess('Successfully created check monitor and facility check!');
-    
-
-      } catch (error) {
-        hideLoading();
+      if (errors.length === 0) {
+        showSuccess(`Successfully added ${successCount} monitor${successCount !== 1 ? 's' : ''} to check "${selectedCheck.name}"!`);
+      } else if (successCount > 0) {
+        showSuccess(`Added ${successCount} monitor${successCount !== 1 ? 's' : ''} successfully.`);
+        showError(`${errors.length} failed: ${errors.join('; ')}`);
+      } else {
+        showError(`All submissions failed: ${errors.join('; ')}`);
         validateForm();
       }
     }
 
-    // Utility functions
+    // Utilities
     function debounce(func, wait) {
       let timeout;
-      return function executedFunction(...args) {
-        const later = () => {
-          clearTimeout(timeout);
-          func(...args);
-        };
+      return function(...args) {
+        const later = () => { clearTimeout(timeout); func(...args); };
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
       };
     }
 
-    function showLoading() {
-      loadingEl.classList.remove('hide');
-    }
-
-    function hideLoading() {
-      loadingEl.classList.add('hide');
-    }
-
-    function showError(message) {
-      errorEl.textContent = message;
-      errorEl.classList.remove('hide');
-    }
-
-    function showSuccess(message) {
-      successEl.textContent = message;
-      successEl.classList.remove('hide');
-    }
-
+    function showLoading() { loadingEl.classList.remove('hide'); }
+    function hideLoading() { loadingEl.classList.add('hide'); }
+    function showError(msg) { errorEl.textContent = msg; errorEl.classList.remove('hide'); }
+    function showSuccess(msg) { successEl.textContent = msg; successEl.classList.remove('hide'); }
     function hideMessages() {
       loadingEl.classList.add('hide');
       errorEl.classList.add('hide');
       successEl.classList.add('hide');
     }
 
-    // Initialize
     disableAll();
-
   })();
   </script>
 </body>
